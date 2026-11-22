@@ -1,0 +1,16 @@
+{
+  "name": "Snakes & Ladders Casual Game",
+  "short_name": "Snakes & Ladders",
+  "description": "Playful, responsive casual Snakes & Ladders board game for mobile and desktop",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF8EF",
+  "theme_color": "#6558E8",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
