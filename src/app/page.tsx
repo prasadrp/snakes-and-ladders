@@ -13,7 +13,6 @@ import { ExitGameDialog } from '@/components/game/ExitGameDialog';
 import { WinnerPanel } from '@/components/result/WinnerPanel';
 import { HowToPlayModal } from '@/components/modals/HowToPlayModal';
 import { SettingsModal } from '@/components/modals/SettingsModal';
-import { Button } from '@/components/common/Button';
 import { PLAYER_COLORS } from '@/lib/game/constants';
 import { PlayMode } from '@/lib/game/types';
 import { getPreferences, BoardTheme } from '@/lib/storage/preferences';
@@ -25,109 +24,14 @@ import {
   Copy,
   Check,
   Sparkles,
+  Gamepad2,
+  Globe,
+  KeyRound,
+  Play,
+  RotateCcw,
 } from 'lucide-react';
 
 type ScreenView = 'home' | 'create-room' | 'join-room' | 'room-lobby' | 'setup' | 'game';
-
-/**
- * 3D Isometric Dice SVG matching user screenshot
- * White cube with dark border, red dot on top face, black dots on side faces
- */
-function IsometricDiceLogo({ className = 'w-24 h-24 sm:w-28 sm:h-28' }: { className?: string }) {
-  return (
-    <div className={`relative ${className} mx-auto flex items-center justify-center select-none`}>
-      <svg
-        viewBox="0 0 120 120"
-        className="w-full h-full drop-shadow-[0_8px_16px_rgba(0,0,0,0.08)]"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Floor shadow */}
-        <ellipse cx="60" cy="112" rx="42" ry="7" fill="#000000" fillOpacity="0.08" />
-
-        {/* Top Face */}
-        <polygon
-          points="60,18 106,42 60,66 14,42"
-          fill="#FFFFFF"
-          stroke="#1E293B"
-          strokeWidth="4.5"
-          strokeLinejoin="round"
-        />
-        {/* Red center pip on top face */}
-        <ellipse cx="60" cy="42" rx="6.5" ry="4.5" fill="#E11D48" />
-
-        {/* Left Face */}
-        <polygon
-          points="14,42 60,66 60,108 14,84"
-          fill="#F8FAFC"
-          stroke="#1E293B"
-          strokeWidth="4.5"
-          strokeLinejoin="round"
-        />
-        {/* Left Face Pips (3 black dots) */}
-        <ellipse cx="28" cy="54" rx="3.5" ry="5" fill="#1E293B" transform="rotate(-15 28 54)" />
-        <ellipse cx="37" cy="75" rx="3.5" ry="5" fill="#1E293B" transform="rotate(-15 37 75)" />
-        <ellipse cx="46" cy="96" rx="3.5" ry="5" fill="#1E293B" transform="rotate(-15 46 96)" />
-
-        {/* Right Face */}
-        <polygon
-          points="60,66 106,42 106,84 60,108"
-          fill="#E2E8F0"
-          stroke="#1E293B"
-          strokeWidth="4.5"
-          strokeLinejoin="round"
-        />
-        {/* Right Face Pips (4 black dots) */}
-        <ellipse cx="76" cy="58" rx="3.5" ry="5" fill="#1E293B" transform="rotate(15 76 58)" />
-        <ellipse cx="92" cy="50" rx="3.5" ry="5" fill="#1E293B" transform="rotate(15 92 50)" />
-        <ellipse cx="76" cy="96" rx="3.5" ry="5" fill="#1E293B" transform="rotate(15 76 96)" />
-        <ellipse cx="92" cy="88" rx="3.5" ry="5" fill="#1E293B" transform="rotate(15 92 88)" />
-      </svg>
-    </div>
-  );
-}
-
-/**
- * Cyan Globe Badge matching screenshot
- */
-function GlobeBadge({ size = 'sm' }: { size?: 'sm' | 'lg' }) {
-  if (size === 'lg') {
-    return (
-      <div className="w-16 h-16 rounded-full bg-[#00B4D8] border-[3.5px] border-[#1E293B] flex items-center justify-center shadow-sm select-none">
-        <svg
-          viewBox="0 0 24 24"
-          className="w-10 h-10 text-white"
-          fill="none"
-          stroke="#1E293B"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" fill="#00B4D8" />
-          <line x1="2" y1="12" x2="22" y2="12" stroke="#FFFFFF" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#FFFFFF" />
-        </svg>
-      </div>
-    );
-  }
-  return (
-    <div className="w-8 h-8 rounded-full bg-[#00B4D8] border-2 border-[#1E293B] flex items-center justify-center shadow-sm shrink-0 select-none">
-      <svg
-        viewBox="0 0 24 24"
-        className="w-5 h-5 text-white"
-        fill="none"
-        stroke="#1E293B"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="12" cy="12" r="10" fill="#00B4D8" />
-        <line x1="2" y1="12" x2="22" y2="12" stroke="#FFFFFF" />
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#FFFFFF" />
-      </svg>
-    </div>
-  );
-}
 
 export default function HomePage() {
   const [currentView, setCurrentView] = useState<ScreenView>('home');
@@ -138,7 +42,7 @@ export default function HomePage() {
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('vintage-paper');
 
   // Online Room State
-  const [onlineHostName, setOnlineHostName] = useState('Player 1');
+  const [onlineHostName, setOnlineHostName] = useState('You');
   const [onlineJoinName, setOnlineJoinName] = useState('Player 2');
   const [enteredRoomCode, setEnteredRoomCode] = useState('');
   const [activeRoomCode, setActiveRoomCode] = useState('');
@@ -223,7 +127,7 @@ export default function HomePage() {
   // Join Room Action
   const handleJoinRoom = () => {
     const code = enteredRoomCode.trim() || 'LADDER-88';
-    const guest = onlineJoinName.trim() || 'Guest';
+    const guest = onlineJoinName.trim() || 'Player 2';
     setActiveRoomCode(code);
     setRoomLobbyPlayers(['Host Player', guest]);
     setCurrentView('room-lobby');
@@ -278,14 +182,14 @@ export default function HomePage() {
   const isBotTurn = Boolean(currentPlayer?.isBot);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-between bg-[#FFF9F3] bg-[radial-gradient(#E8DFD5_1.5px,transparent_1.5px)] [background-size:24px_24px] pb-6 px-3 sm:px-4">
-      {/* Universal App Header with minimal sound & settings icons */}
+    <main className="min-h-screen flex flex-col items-center justify-between bg-[#FFF8EF] bg-[radial-gradient(#E8DFD5_1.5px,transparent_1.5px)] [background-size:24px_24px] pb-6 px-3 sm:px-4">
+      {/* Universal App Header with sound and settings */}
       <AppHeader
         isMuted={isMuted}
         onToggleMute={toggleMute}
         onOpenHowToPlay={() => setShowHowToPlay(true)}
         onOpenSettings={() => setShowSettings(true)}
-        minimal={currentView === 'home' || currentView === 'create-room' || currentView === 'join-room' || currentView === 'room-lobby'}
+        minimal={currentView === 'home'}
         showHomeButton={currentView !== 'home'}
         onHomeClick={() => {
           if (currentView === 'game' && gameState.status === 'playing') {
@@ -297,91 +201,174 @@ export default function HomePage() {
       />
 
       {/* ========================================================
-          SCREEN 1: HOME SCREEN (Exact 1:1 match to Screenshot 1)
+          SCREEN 1: HOME SCREEN (Custom Casual Game Theme)
          ======================================================== */}
       {currentView === 'home' && (
-        <div className="w-full max-w-sm mx-auto flex-1 flex flex-col items-center justify-center py-6 px-2 text-center animate-fadeIn">
-          {/* 3D Isometric Dice Graphic */}
-          <div className="mb-4">
-            <IsometricDiceLogo />
+        <div className="w-full max-w-md mx-auto flex-1 flex flex-col items-center justify-center py-4 px-2 text-center animate-fadeIn">
+          {/* Hero Branding Badge */}
+          <div className="relative mb-3 flex flex-col items-center select-none">
+            {/* Animated 3D Game Dice Badge */}
+            <div className="relative">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-[#6558E8] via-[#7F74F6] to-[#A298FA] flex items-center justify-center text-5xl sm:text-6xl shadow-xl shadow-[#6558E8]/35 border-4 border-white transform hover:rotate-6 transition-all duration-300">
+                🎲
+              </div>
+              <div className="absolute -top-2 -right-2 bg-[#FFB84D] text-[#4A3200] font-black text-[11px] px-2.5 py-1 rounded-full shadow-md border-2 border-white flex items-center gap-1">
+                <span>⭐</span>
+                <span>100 TILES</span>
+              </div>
+            </div>
+
+            {/* Title with Gaming Typography */}
+            <h1 className="text-3xl sm:text-4xl font-heading text-[#25233A] tracking-wide mt-4 mb-1 drop-shadow-xs">
+              SNAKES &amp; LADDERS
+            </h1>
+            <p className="text-xs sm:text-sm font-bold text-[#77758A] max-w-xs mx-auto">
+              Classic Board Adventure with Real 3D Dice
+            </p>
+
+            {/* Quick feature tags */}
+            <div className="flex items-center justify-center gap-1.5 mt-2.5 select-none flex-wrap">
+              <span className="text-[10px] font-extrabold bg-[#6558E8]/10 text-[#6558E8] px-2.5 py-0.5 rounded-full border border-[#6558E8]/20">
+                🤖 AI Robo
+              </span>
+              <span className="text-[10px] font-extrabold bg-[#FFB84D]/20 text-[#B45309] px-2.5 py-0.5 rounded-full border border-[#FFB84D]/30">
+                🎲 3D Physics
+              </span>
+              <span className="text-[10px] font-extrabold bg-[#10B981]/15 text-[#047857] px-2.5 py-0.5 rounded-full border border-[#10B981]/25">
+                📜 Vintage Paper
+              </span>
+            </div>
           </div>
 
-          {/* Main Title */}
-          <h1 className="text-3xl sm:text-4xl font-black text-[#1E293B] tracking-tight mb-2">
-            Snakes &amp; Ladders
-          </h1>
-
-          {/* Emoji row: 🐍 🪜 🎲 🏆 */}
-          <div className="flex items-center justify-center gap-3 text-2xl mb-8 select-none">
-            <span>🐍</span>
-            <span>🪜</span>
-            <span>🎲</span>
-            <span>🏆</span>
-          </div>
-
-          {/* 3 Main Action Buttons */}
-          <div className="w-full space-y-4">
-            {/* Button 1: Create Room */}
-            <button
-              type="button"
-              onClick={() => {
-                playClick();
-                setCurrentView('create-room');
-              }}
-              className="w-full py-4 px-6 rounded-2xl bg-[#F85959] hover:bg-[#EE4444] text-white font-extrabold text-lg sm:text-xl shadow-[0_5px_0_#D43838] active:translate-y-1 active:shadow-[0_2px_0_#D43838] transition-all flex items-center justify-center gap-3 select-none"
-            >
-              <GlobeBadge size="sm" />
-              <span>Create Room</span>
-            </button>
-
-            {/* Button 2: Join with Code */}
-            <button
-              type="button"
-              onClick={() => {
-                playClick();
-                setCurrentView('join-room');
-              }}
-              className="w-full py-4 px-6 rounded-2xl bg-white hover:bg-[#FAFAFA] text-[#1E293B] font-extrabold text-lg sm:text-xl border-2 border-[#E2E8F0] shadow-[0_5px_0_#CBD5E1] active:translate-y-1 active:shadow-[0_2px_0_#CBD5E1] transition-all flex items-center justify-center gap-3 select-none"
-            >
-              <span className="text-2xl shrink-0 -rotate-45">🔑</span>
-              <span>Join with Code</span>
-            </button>
-
-            {/* Button 3: Local Game (Offline) */}
-            <button
-              type="button"
+          {/* Mode Selection Cards */}
+          <div className="w-full space-y-3.5 my-4">
+            {/* CARD 1: Play vs Robo 🤖 (Solo vs Computer) */}
+            <div
               onClick={() => {
                 playClick();
                 handleModeChange('vs-computer');
                 setCurrentView('setup');
               }}
-              className="w-full py-4 px-6 rounded-2xl bg-white hover:bg-[#FAFAFA] text-[#1E293B] font-extrabold text-lg sm:text-xl border-2 border-[#E2E8F0] shadow-[0_5px_0_#CBD5E1] active:translate-y-1 active:shadow-[0_2px_0_#CBD5E1] transition-all flex items-center justify-center gap-3 select-none"
+              className="group cursor-pointer w-full p-4 rounded-3xl bg-gradient-to-r from-[#6558E8] to-[#7C3AED] text-white shadow-[0_6px_0_#4338CA] hover:shadow-[0_4px_0_#4338CA] hover:translate-y-0.5 active:translate-y-1.5 active:shadow-[0_1px_0_#4338CA] transition-all border-2 border-white/20 text-left relative overflow-hidden"
             >
-              <span className="text-2xl shrink-0">🏠</span>
-              <span>Local Game (Offline)</span>
-            </button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-13 h-13 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-3xl shadow-sm shrink-0">
+                    🤖
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-heading text-xl sm:text-2xl text-white tracking-wide">
+                        Play vs Robo
+                      </span>
+                      <span className="text-[10px] font-black bg-[#FFB84D] text-[#4A3200] px-2 py-0.5 rounded-md shadow-xs">
+                        QUICK
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/85 font-medium mt-0.5">
+                      Single player vs smart AI with auto-dice rolls
+                    </p>
+                  </div>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-white/25 flex items-center justify-center text-white shrink-0 group-hover:translate-x-1 transition-transform">
+                  <Play className="w-5 h-5 fill-current" />
+                </div>
+              </div>
+            </div>
+
+            {/* CARD 2: Pass & Play (Friends on same device) */}
+            <div
+              onClick={() => {
+                playClick();
+                handleModeChange('pass-and-play');
+                setCurrentView('setup');
+              }}
+              className="group cursor-pointer w-full p-4 rounded-3xl bg-gradient-to-r from-[#10B981] to-[#059669] text-white shadow-[0_6px_0_#047857] hover:shadow-[0_4px_0_#047857] hover:translate-y-0.5 active:translate-y-1.5 active:shadow-[0_1px_0_#047857] transition-all border-2 border-white/20 text-left relative overflow-hidden"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-13 h-13 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-3xl shadow-sm shrink-0">
+                    👥
+                  </div>
+                  <div>
+                    <span className="font-heading text-xl sm:text-2xl text-white tracking-wide block">
+                      Pass &amp; Play
+                    </span>
+                    <p className="text-xs text-white/85 font-medium mt-0.5">
+                      2 to 4 friends taking turns on one screen
+                    </p>
+                  </div>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-white/25 flex items-center justify-center text-white shrink-0 group-hover:translate-x-1 transition-transform">
+                  <Users className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+
+            {/* CARD 3: Multiplayer Rooms (Create or Join via Code) */}
+            <div className="w-full p-4 rounded-3xl bg-white border-2 border-[#E9E2D9] shadow-[0_6px_0_#DCD3C7] text-left">
+              <div className="flex items-center gap-2 mb-2.5">
+                <span className="text-xl">🌐</span>
+                <span className="font-heading text-lg text-[#25233A] tracking-wide">
+                  Play with Code
+                </span>
+                <span className="text-[10px] font-extrabold bg-[#6558E8]/10 text-[#6558E8] px-2 py-0.5 rounded-md ml-auto">
+                  ROOMS
+                </span>
+              </div>
+              <p className="text-xs text-[#77758A] font-medium mb-3">
+                Create a private game room code or enter a code from friends:
+              </p>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick();
+                    setCurrentView('create-room');
+                  }}
+                  className="py-3 px-3 rounded-2xl bg-[#EF4444] hover:bg-[#DC2626] text-white font-heading text-sm tracking-wide shadow-[0_4px_0_#B91C1C] active:translate-y-1 active:shadow-[0_1px_0_#B91C1C] transition-all flex items-center justify-center gap-1.5 select-none"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>Create Room</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick();
+                    setCurrentView('join-room');
+                  }}
+                  className="py-3 px-3 rounded-2xl bg-[#0D9488] hover:bg-[#0F766E] text-white font-heading text-sm tracking-wide shadow-[0_4px_0_#115E59] active:translate-y-1 active:shadow-[0_1px_0_#115E59] transition-all flex items-center justify-center gap-1.5 select-none"
+                >
+                  <KeyRound className="w-4 h-4" />
+                  <span>Join Code</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* ========================================================
-          SCREEN 2: CREATE ROOM (Exact 1:1 match to Screenshot 2)
+          SCREEN 2: CREATE ROOM (Theme Integrated)
          ======================================================== */}
       {currentView === 'create-room' && (
         <div className="w-full max-w-sm mx-auto flex-1 flex flex-col items-center justify-center py-4 px-2 animate-fadeIn">
-          <div className="w-full bg-white rounded-[2.25rem] p-7 sm:p-9 shadow-[0_15px_35px_rgba(0,0,0,0.06)] border border-[#F1EBE3] flex flex-col items-center text-center">
-            {/* Globe icon */}
-            <div className="mb-3">
-              <GlobeBadge size="lg" />
+          <div className="w-full bg-white rounded-3xl p-6 sm:p-7 shadow-[0_10px_25px_rgba(0,0,0,0.05)] border-2 border-[#E9E2D9] text-center">
+            {/* Header Icon */}
+            <div className="w-14 h-14 rounded-2xl bg-[#EF4444]/10 border-2 border-[#EF4444]/30 text-[#EF4444] flex items-center justify-center text-3xl mx-auto mb-3 shadow-xs">
+              🌐
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E293B] mb-7">
+            <h2 className="text-2xl sm:text-3xl font-heading text-[#25233A] mb-1">
               Create Room
             </h2>
+            <p className="text-xs font-semibold text-[#77758A] mb-5">
+              Host your own game room &amp; invite players
+            </p>
 
-            {/* Form */}
-            <div className="w-full text-left mb-7">
-              <label className="text-[11px] font-extrabold text-[#64748B] tracking-wider block mb-2 uppercase">
+            {/* Input Form */}
+            <div className="w-full text-left mb-6">
+              <label className="text-xs font-bold text-[#77758A] tracking-wider block mb-2 uppercase">
                 YOUR NAME
               </label>
               <input
@@ -390,22 +377,22 @@ export default function HomePage() {
                 value={onlineHostName}
                 onChange={(e) => setOnlineHostName(e.target.value)}
                 placeholder="Enter your name..."
-                className="w-full px-4 py-3.5 rounded-2xl border-2 border-[#E2E8F0] focus:border-[#F85959] focus:outline-none text-[#1E293B] font-bold text-base placeholder:text-[#94A3B8] transition-all"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-[#E9E2D9] focus:border-[#EF4444] focus:outline-none text-[#25233A] font-bold text-base placeholder:text-[#94A3B8] transition-all bg-[#FFF8EF]"
               />
             </div>
 
             {/* Actions */}
-            <div className="w-full space-y-3">
+            <div className="w-full space-y-2.5">
               <button
                 type="button"
                 onClick={() => {
                   playClick();
                   handleCreateRoom();
                 }}
-                className="w-full py-4 rounded-2xl bg-[#F85959] hover:bg-[#EE4444] text-white font-extrabold text-lg shadow-[0_5px_0_#D43838] active:translate-y-1 active:shadow-[0_2px_0_#D43838] transition-all flex items-center justify-center gap-2 select-none"
+                className="w-full py-3.5 rounded-2xl bg-[#EF4444] hover:bg-[#DC2626] text-white font-heading text-lg tracking-wide shadow-[0_5px_0_#B91C1C] active:translate-y-1 active:shadow-[0_1px_0_#B91C1C] transition-all flex items-center justify-center gap-2 select-none"
               >
                 <span>🚀</span>
-                <span>Create</span>
+                <span>Create Room</span>
               </button>
 
               <button
@@ -414,7 +401,7 @@ export default function HomePage() {
                   playClick();
                   setCurrentView('home');
                 }}
-                className="w-full py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-[#334155] font-bold text-base border-2 border-[#E2E8F0] shadow-[0_3px_0_#E2E8F0] active:translate-y-0.5 transition-all flex items-center justify-center gap-2 select-none"
+                className="w-full py-3 rounded-2xl bg-white hover:bg-gray-50 text-[#25233A] font-bold text-sm border-2 border-[#E9E2D9] shadow-[0_3px_0_#E9E2D9] active:translate-y-0.5 transition-all flex items-center justify-center gap-2 select-none"
               >
                 <span>← Back</span>
               </button>
@@ -424,24 +411,27 @@ export default function HomePage() {
       )}
 
       {/* ========================================================
-          SCREEN 3: JOIN WITH CODE (Exact 1:1 match to Screenshot 3)
+          SCREEN 3: JOIN WITH CODE (Theme Integrated)
          ======================================================== */}
       {currentView === 'join-room' && (
         <div className="w-full max-w-sm mx-auto flex-1 flex flex-col items-center justify-center py-4 px-2 animate-fadeIn">
-          <div className="w-full bg-white rounded-[2.25rem] p-7 sm:p-9 shadow-[0_15px_35px_rgba(0,0,0,0.06)] border border-[#F1EBE3] flex flex-col items-center text-center">
-            {/* Key icon */}
-            <div className="w-16 h-16 rounded-full bg-amber-50 border-[3.5px] border-[#1E293B] flex items-center justify-center text-3xl mb-3 shadow-sm select-none">
-              <span className="transform -rotate-45 block">🔑</span>
+          <div className="w-full bg-white rounded-3xl p-6 sm:p-7 shadow-[0_10px_25px_rgba(0,0,0,0.05)] border-2 border-[#E9E2D9] text-center">
+            {/* Key Icon */}
+            <div className="w-14 h-14 rounded-2xl bg-[#0D9488]/10 border-2 border-[#0D9488]/30 text-[#0D9488] flex items-center justify-center text-3xl mx-auto mb-3 shadow-xs">
+              🔑
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E293B] mb-7">
+            <h2 className="text-2xl sm:text-3xl font-heading text-[#25233A] mb-1">
               Join with Code
             </h2>
+            <p className="text-xs font-semibold text-[#77758A] mb-5">
+              Enter room code shared by your friend
+            </p>
 
-            {/* Form */}
-            <div className="w-full text-left space-y-4 mb-7">
+            {/* Inputs */}
+            <div className="w-full text-left space-y-4 mb-6">
               <div>
-                <label className="text-[11px] font-extrabold text-[#64748B] tracking-wider block mb-2 uppercase">
+                <label className="text-xs font-bold text-[#77758A] tracking-wider block mb-2 uppercase">
                   YOUR NAME
                 </label>
                 <input
@@ -450,12 +440,12 @@ export default function HomePage() {
                   value={onlineJoinName}
                   onChange={(e) => setOnlineJoinName(e.target.value)}
                   placeholder="Enter your name..."
-                  className="w-full px-4 py-3.5 rounded-2xl border-2 border-[#E2E8F0] focus:border-[#2DD4BF] focus:outline-none text-[#1E293B] font-bold text-base placeholder:text-[#94A3B8] transition-all"
+                  className="w-full px-4 py-3 rounded-2xl border-2 border-[#E9E2D9] focus:border-[#0D9488] focus:outline-none text-[#25233A] font-bold text-base placeholder:text-[#94A3B8] transition-all bg-[#FFF8EF]"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-extrabold text-[#64748B] tracking-wider block mb-2 uppercase">
+                <label className="text-xs font-bold text-[#77758A] tracking-wider block mb-2 uppercase">
                   ROOM CODE
                 </label>
                 <input
@@ -463,24 +453,24 @@ export default function HomePage() {
                   maxLength={16}
                   value={enteredRoomCode}
                   onChange={(e) => setEnteredRoomCode(e.target.value.toUpperCase())}
-                  placeholder="Enter room code..."
-                  className="w-full px-4 py-3.5 rounded-2xl border-2 border-[#E2E8F0] focus:border-[#2DD4BF] focus:outline-none text-[#1E293B] font-mono font-bold text-base tracking-wider placeholder:text-[#94A3B8] transition-all uppercase"
+                  placeholder="e.g. LADDER-88"
+                  className="w-full px-4 py-3 rounded-2xl border-2 border-[#E9E2D9] focus:border-[#0D9488] focus:outline-none text-[#25233A] font-mono font-bold text-base tracking-wider placeholder:text-[#94A3B8] transition-all uppercase bg-[#FFF8EF]"
                 />
               </div>
             </div>
 
             {/* Actions */}
-            <div className="w-full space-y-3">
+            <div className="w-full space-y-2.5">
               <button
                 type="button"
                 onClick={() => {
                   playClick();
                   handleJoinRoom();
                 }}
-                className="w-full py-4 rounded-2xl bg-[#2DD4BF] hover:bg-[#14B8A6] text-white font-extrabold text-lg shadow-[0_5px_0_#0D9488] active:translate-y-1 active:shadow-[0_2px_0_#0D9488] transition-all flex items-center justify-center gap-2 select-none"
+                className="w-full py-3.5 rounded-2xl bg-[#0D9488] hover:bg-[#0F766E] text-white font-heading text-lg tracking-wide shadow-[0_5px_0_#115E59] active:translate-y-1 active:shadow-[0_1px_0_#115E59] transition-all flex items-center justify-center gap-2 select-none"
               >
                 <span>🎮</span>
-                <span>Join</span>
+                <span>Join Game</span>
               </button>
 
               <button
@@ -489,7 +479,7 @@ export default function HomePage() {
                   playClick();
                   setCurrentView('home');
                 }}
-                className="w-full py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-[#334155] font-bold text-base border-2 border-[#E2E8F0] shadow-[0_3px_0_#E2E8F0] active:translate-y-0.5 transition-all flex items-center justify-center gap-2 select-none"
+                className="w-full py-3 rounded-2xl bg-white hover:bg-gray-50 text-[#25233A] font-bold text-sm border-2 border-[#E9E2D9] shadow-[0_3px_0_#E9E2D9] active:translate-y-0.5 transition-all flex items-center justify-center gap-2 select-none"
               >
                 <span>← Back</span>
               </button>
@@ -499,36 +489,36 @@ export default function HomePage() {
       )}
 
       {/* ========================================================
-          SCREEN 4: ROOM LOBBY (When Room is Created or Joined)
+          SCREEN 4: ROOM LOBBY
          ======================================================== */}
       {currentView === 'room-lobby' && (
         <div className="w-full max-w-sm mx-auto flex-1 flex flex-col items-center justify-center py-4 px-2 animate-fadeIn">
-          <div className="w-full bg-white rounded-[2.25rem] p-6 sm:p-8 shadow-[0_15px_35px_rgba(0,0,0,0.06)] border border-[#F1EBE3] flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center text-2xl mb-3 shadow-sm">
-              🌐
+          <div className="w-full bg-white rounded-3xl p-6 sm:p-7 shadow-[0_10px_25px_rgba(0,0,0,0.05)] border-2 border-[#E9E2D9] text-center">
+            <div className="w-13 h-13 rounded-2xl bg-[#6558E8]/10 text-[#6558E8] flex items-center justify-center text-3xl mx-auto mb-2 shadow-xs">
+              🎲
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-black text-[#1E293B] mb-1">
+            <h2 className="text-2xl font-heading text-[#25233A] mb-1">
               Room Lobby
             </h2>
-            <p className="text-xs text-[#64748B] mb-4">
+            <p className="text-xs font-semibold text-[#77758A] mb-4">
               Share code with friends to join!
             </p>
 
             {/* Room Code Box */}
-            <div className="w-full p-3.5 bg-[#FFF9F3] rounded-2xl border-2 border-[#E2E8F0] flex items-center justify-between mb-5">
+            <div className="w-full p-3.5 bg-[#FFF8EF] rounded-2xl border-2 border-[#E9E2D9] flex items-center justify-between mb-4">
               <div className="text-left">
-                <span className="text-[10px] font-bold text-[#64748B] block uppercase tracking-wider">
+                <span className="text-[10px] font-black text-[#77758A] block uppercase tracking-wider">
                   Room Code
                 </span>
-                <span className="font-mono font-black text-xl text-[#1E293B] tracking-wider">
+                <span className="font-mono font-black text-xl text-[#25233A] tracking-wider">
                   {activeRoomCode}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={handleCopyCode}
-                className="px-3.5 py-2 rounded-xl bg-white border border-[#CBD5E1] text-[#1E293B] font-bold text-xs flex items-center gap-1.5 shadow-sm hover:bg-gray-50 active:scale-95 transition-all"
+                className="px-3.5 py-2 rounded-xl bg-white border-2 border-[#E9E2D9] text-[#25233A] font-bold text-xs flex items-center gap-1.5 shadow-xs hover:bg-gray-50 active:scale-95 transition-all"
               >
                 {copiedCode ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                 <span>{copiedCode ? 'Copied!' : 'Copy'}</span>
@@ -536,15 +526,15 @@ export default function HomePage() {
             </div>
 
             {/* Players in Room */}
-            <div className="w-full text-left mb-6">
-              <span className="text-[11px] font-extrabold text-[#64748B] tracking-wider block mb-2 uppercase">
-                Players ({roomLobbyPlayers.length}/4)
+            <div className="w-full text-left mb-5">
+              <span className="text-[11px] font-black text-[#77758A] tracking-wider block mb-2 uppercase">
+                Players in Room ({roomLobbyPlayers.length}/4)
               </span>
               <div className="space-y-2">
                 {roomLobbyPlayers.map((name, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#FFF8EF] border border-[#E9E2D9]"
                   >
                     <div className="flex items-center gap-2">
                       <div
@@ -553,10 +543,10 @@ export default function HomePage() {
                       >
                         {idx + 1}
                       </div>
-                      <span className="text-sm font-bold text-[#1E293B]">{name}</span>
+                      <span className="text-sm font-bold text-[#25233A]">{name}</span>
                     </div>
-                    <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                      Ready
+                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+                      READY
                     </span>
                   </div>
                 ))}
@@ -564,17 +554,17 @@ export default function HomePage() {
             </div>
 
             {/* Lobby actions */}
-            <div className="w-full space-y-2.5">
+            <div className="w-full space-y-2">
               <button
                 type="button"
                 onClick={() => {
                   playClick();
                   handleStartLobbyGame();
                 }}
-                className="w-full py-3.5 rounded-2xl bg-[#F85959] hover:bg-[#EE4444] text-white font-extrabold text-base shadow-[0_5px_0_#D43838] active:translate-y-1 active:shadow-[0_2px_0_#D43838] transition-all flex items-center justify-center gap-2 select-none"
+                className="w-full py-3.5 rounded-2xl bg-[#6558E8] hover:bg-[#5245DC] text-white font-heading text-lg tracking-wide shadow-[0_5px_0_#4338CA] active:translate-y-1 active:shadow-[0_1px_0_#4338CA] transition-all flex items-center justify-center gap-2 select-none"
               >
-                <span>🎲</span>
-                <span>Start Game</span>
+                <span>🎮</span>
+                <span>Start Match</span>
               </button>
 
               <button
@@ -583,7 +573,7 @@ export default function HomePage() {
                   playClick();
                   setCurrentView('home');
                 }}
-                className="w-full py-3 rounded-2xl bg-white hover:bg-gray-50 text-[#334155] font-bold text-sm border-2 border-[#E2E8F0] shadow-[0_3px_0_#E2E8F0] active:translate-y-0.5 transition-all flex items-center justify-center gap-2 select-none"
+                className="w-full py-2.5 rounded-2xl bg-white hover:bg-gray-50 text-[#77758A] font-bold text-xs border border-[#E9E2D9] active:scale-98 transition-all flex items-center justify-center gap-1.5 select-none"
               >
                 <span>← Leave Room</span>
               </button>
@@ -593,7 +583,7 @@ export default function HomePage() {
       )}
 
       {/* ========================================================
-          SCREEN 5: LOCAL GAME SETUP (Opened via 'Local Game (Offline)')
+          SCREEN 5: GAME SETUP SCREEN (vs Robo / Pass & Play)
          ======================================================== */}
       {currentView === 'setup' && (
         <div className="w-full max-w-md mx-auto flex-1 flex flex-col justify-start py-2 px-2 animate-fadeIn">
@@ -603,17 +593,17 @@ export default function HomePage() {
                 playClick();
                 setCurrentView('home');
               }}
-              className="w-10 h-10 rounded-2xl bg-white border-2 border-[#E2E8F0] shadow-[0_3px_0_#CBD5E1] active:translate-y-0.5 flex items-center justify-center text-[#25233A] hover:bg-gray-50 transition-all"
+              className="w-10 h-10 rounded-2xl bg-white border-2 border-[#E9E2D9] shadow-[0_3px_0_#DCD3C7] active:translate-y-0.5 flex items-center justify-center text-[#25233A] hover:bg-gray-50 transition-all"
               aria-label="Back to home"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h2 className="text-xl sm:text-2xl font-black text-[#1E293B]">
-              Offline Game Setup
+            <h2 className="text-2xl font-heading text-[#25233A]">
+              Game Setup
             </h2>
           </div>
 
-          <div className="bg-white rounded-[2rem] p-5 border border-[#E9E2D9] shadow-sm space-y-5">
+          <div className="bg-white rounded-3xl p-5 border-2 border-[#E9E2D9] shadow-sm space-y-5">
             {/* Game Mode Selector: vs Robo 🤖 vs Pass & Play */}
             <div>
               <label className="text-xs font-bold text-[#77758A] uppercase tracking-wider block mb-2">
@@ -623,10 +613,10 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => handleModeChange('vs-computer')}
-                  className={`h-12 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${
+                  className={`h-12 rounded-2xl font-heading text-base flex items-center justify-center gap-2 transition-all active:scale-95 ${
                     gameMode === 'vs-computer'
-                      ? 'bg-[#6558E8] text-white shadow-md shadow-[#6558E8]/25'
-                      : 'bg-[#FFF8EF] text-[#25233A] border border-[#E9E2D9] hover:bg-gray-100'
+                      ? 'bg-[#6558E8] text-white shadow-[0_4px_0_#4338CA]'
+                      : 'bg-[#FFF8EF] text-[#25233A] border-2 border-[#E9E2D9] hover:bg-gray-100'
                   }`}
                 >
                   <Bot className="w-4 h-4" />
@@ -635,10 +625,10 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => handleModeChange('pass-and-play')}
-                  className={`h-12 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${
+                  className={`h-12 rounded-2xl font-heading text-base flex items-center justify-center gap-2 transition-all active:scale-95 ${
                     gameMode === 'pass-and-play'
-                      ? 'bg-[#6558E8] text-white shadow-md shadow-[#6558E8]/25'
-                      : 'bg-[#FFF8EF] text-[#25233A] border border-[#E9E2D9] hover:bg-gray-100'
+                      ? 'bg-[#6558E8] text-white shadow-[0_4px_0_#4338CA]'
+                      : 'bg-[#FFF8EF] text-[#25233A] border-2 border-[#E9E2D9] hover:bg-gray-100'
                   }`}
                 >
                   <Users className="w-4 h-4" />
@@ -661,10 +651,10 @@ export default function HomePage() {
                       playClick();
                       setPlayerCount(cnt);
                     }}
-                    className={`h-12 rounded-2xl font-black text-base flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
+                    className={`h-12 rounded-2xl font-heading text-base flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
                       playerCount === cnt
-                        ? 'bg-[#6558E8] text-white shadow-md shadow-[#6558E8]/25'
-                        : 'bg-[#FFF8EF] text-[#25233A] border border-[#E9E2D9] hover:bg-gray-100'
+                        ? 'bg-[#6558E8] text-white shadow-[0_4px_0_#4338CA]'
+                        : 'bg-[#FFF8EF] text-[#25233A] border-2 border-[#E9E2D9] hover:bg-gray-100'
                     }`}
                   >
                     <span>{cnt} Players</span>
@@ -685,11 +675,11 @@ export default function HomePage() {
                   return (
                     <div
                       key={idx}
-                      className="flex items-center gap-2.5 p-1.5 bg-[#FFF8EF] rounded-2xl border border-[#E9E2D9] focus-within:border-[#6558E8] focus-within:bg-white transition-all"
+                      className="flex items-center gap-2.5 p-1.5 bg-[#FFF8EF] rounded-2xl border-2 border-[#E9E2D9] focus-within:border-[#6558E8] focus-within:bg-white transition-all"
                     >
                       <div
                         style={{ backgroundColor: color.bgHex }}
-                        className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-extrabold text-sm shadow-sm shrink-0 border border-white"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-heading text-base shadow-sm shrink-0 border border-white"
                       >
                         {isBot ? <Bot className="w-5 h-5" /> : idx + 1}
                       </div>
@@ -707,7 +697,7 @@ export default function HomePage() {
                         }
                         className="flex-1 bg-transparent border-none text-sm font-bold text-[#25233A] focus:outline-none px-1"
                       />
-                      <span className="text-[11px] font-semibold text-[#77758A] pr-2">
+                      <span className="text-[11px] font-extrabold text-[#77758A] pr-2">
                         {idx === 0 ? 'You (Human)' : isBot ? 'Auto Bot 🤖' : 'Player'}
                       </span>
                     </div>
@@ -725,7 +715,7 @@ export default function HomePage() {
               {/* Six to start */}
               <div
                 onClick={() => setRequireSixToStart(!requireSixToStart)}
-                className="flex items-center justify-between p-2.5 bg-[#FFF8EF] rounded-xl border border-[#E9E2D9] cursor-pointer hover:bg-[#FAF4EB]"
+                className="flex items-center justify-between p-2.5 bg-[#FFF8EF] rounded-2xl border border-[#E9E2D9] cursor-pointer hover:bg-[#FAF4EB]"
               >
                 <div>
                   <span className="font-bold text-xs text-[#25233A] block">
@@ -736,8 +726,8 @@ export default function HomePage() {
                   </span>
                 </div>
                 <div
-                  className={`w-5 h-5 rounded-md flex items-center justify-center ${
-                    requireSixToStart ? 'bg-[#6558E8] text-white' : 'border border-gray-300 bg-white'
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                    requireSixToStart ? 'bg-[#6558E8] text-white shadow-xs' : 'border-2 border-gray-300 bg-white'
                   }`}
                 >
                   {requireSixToStart && <CheckCircle2 className="w-4 h-4" />}
@@ -747,7 +737,7 @@ export default function HomePage() {
               {/* Exact roll to finish */}
               <div
                 onClick={() => setExactRollToFinish(!exactRollToFinish)}
-                className="flex items-center justify-between p-2.5 bg-[#FFF8EF] rounded-xl border border-[#E9E2D9] cursor-pointer hover:bg-[#FAF4EB]"
+                className="flex items-center justify-between p-2.5 bg-[#FFF8EF] rounded-2xl border border-[#E9E2D9] cursor-pointer hover:bg-[#FAF4EB]"
               >
                 <div>
                   <span className="font-bold text-xs text-[#25233A] block">
@@ -758,8 +748,8 @@ export default function HomePage() {
                   </span>
                 </div>
                 <div
-                  className={`w-5 h-5 rounded-md flex items-center justify-center ${
-                    exactRollToFinish ? 'bg-[#6558E8] text-white' : 'border border-gray-300 bg-white'
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                    exactRollToFinish ? 'bg-[#6558E8] text-white shadow-xs' : 'border-2 border-gray-300 bg-white'
                   }`}
                 >
                   {exactRollToFinish && <CheckCircle2 className="w-4 h-4" />}
@@ -769,7 +759,7 @@ export default function HomePage() {
               {/* Extra turn on 6 */}
               <div
                 onClick={() => setExtraTurnOnSix(!extraTurnOnSix)}
-                className="flex items-center justify-between p-2.5 bg-[#FFF8EF] rounded-xl border border-[#E9E2D9] cursor-pointer hover:bg-[#FAF4EB]"
+                className="flex items-center justify-between p-2.5 bg-[#FFF8EF] rounded-2xl border border-[#E9E2D9] cursor-pointer hover:bg-[#FAF4EB]"
               >
                 <div>
                   <span className="font-bold text-xs text-[#25233A] block">
@@ -780,8 +770,8 @@ export default function HomePage() {
                   </span>
                 </div>
                 <div
-                  className={`w-5 h-5 rounded-md flex items-center justify-center ${
-                    extraTurnOnSix ? 'bg-[#6558E8] text-white' : 'border border-gray-300 bg-white'
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                    extraTurnOnSix ? 'bg-[#6558E8] text-white shadow-xs' : 'border-2 border-gray-300 bg-white'
                   }`}
                 >
                   {extraTurnOnSix && <CheckCircle2 className="w-4 h-4" />}
@@ -794,10 +784,10 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleStartGame}
-                className="w-full py-4 rounded-2xl bg-[#6558E8] hover:bg-[#5245DC] text-white font-extrabold text-lg shadow-[0_5px_0_#4338CA] active:translate-y-1 active:shadow-[0_2px_0_#4338CA] transition-all flex items-center justify-center gap-2 select-none"
+                className="w-full py-4 rounded-2xl bg-[#6558E8] hover:bg-[#5245DC] text-white font-heading text-xl tracking-wide shadow-[0_5px_0_#4338CA] active:translate-y-1 active:shadow-[0_1px_0_#4338CA] transition-all flex items-center justify-center gap-2 select-none"
               >
                 <span>🎮</span>
-                <span>Start Playing Now</span>
+                <span>Launch Game</span>
               </button>
             </div>
           </div>
@@ -848,7 +838,7 @@ export default function HomePage() {
                 botName={currentPlayer.name}
               />
               {gameState.lastEvent && (
-                <p className="text-[11px] font-semibold text-[#77758A] mt-1.5 text-center line-clamp-1">
+                <p className="text-[11px] font-bold text-[#77758A] mt-1.5 text-center line-clamp-1">
                   {gameState.lastEvent.text}
                 </p>
               )}

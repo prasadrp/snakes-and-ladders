@@ -28,12 +28,12 @@ export const RollButton: React.FC<RollButtonProps> = ({
         }
       }}
       disabled={disabled || isBotTurn}
-      className={`w-full max-w-xs sm:max-w-sm h-14 rounded-2xl font-black text-lg tracking-wide flex items-center justify-center gap-2.5 transition-all duration-150 select-none shadow-[0_6px_20px_rgba(101,88,232,0.35)] ${
+      className={`w-full max-w-xs sm:max-w-sm h-14 rounded-2xl font-heading text-xl tracking-wider flex items-center justify-center gap-2.5 transition-all duration-150 select-none ${
         isBotTurn
-          ? 'bg-amber-500 text-white shadow-[0_6px_20px_rgba(245,158,11,0.35)] cursor-wait'
+          ? 'bg-amber-500 text-white shadow-[0_5px_0_#D97706] cursor-wait'
           : disabled
           ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
-          : 'bg-[#6558E8] text-white hover:bg-[#5245DA] active:scale-95'
+          : 'bg-[#6558E8] text-white hover:bg-[#5245DA] shadow-[0_5px_0_#4338CA] active:translate-y-1 active:shadow-[0_1px_0_#4338CA]'
       }`}
     >
       {isBotTurn ? (

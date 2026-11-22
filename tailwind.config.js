@@ -24,7 +24,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-game)', 'Fredoka', 'Nunito', 'sans-serif'],
+        heading: ['var(--font-heading)', 'Lilita One', 'Fredoka', 'cursive', 'sans-serif'],
       },
       animation: {
         'bounce-short': 'bounce 0.5s ease-in-out 2',
