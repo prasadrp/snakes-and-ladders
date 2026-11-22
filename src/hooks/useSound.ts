@@ -6,14 +6,14 @@ import { getPreferences, savePreferences } from '@/lib/storage/preferences';
 
 export function useSound() {
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolumeState] = useState(0.6);
+  const [volume, setVolumeState] = useState(0.9);
 
   useEffect(() => {
     const prefs = getPreferences();
     setIsMuted(!prefs.soundEnabled);
-    setVolumeState(prefs.soundVolume);
+    setVolumeState(prefs.soundVolume ?? 0.9);
     soundManager.setMuted(!prefs.soundEnabled);
-    soundManager.setVolume(prefs.soundVolume);
+    soundManager.setVolume(prefs.soundVolume ?? 0.9);
   }, []);
 
   const toggleMute = useCallback(() => {

@@ -44,7 +44,7 @@ export const DICE_COLOR_OPTIONS = [
 
 export const DEFAULT_PREFERENCES: AppPreferences = {
   soundEnabled: true,
-  soundVolume: 0.6,
+  soundVolume: 0.9,
   reducedMotion: 'system',
   fastMode: false,
   diceDotColor: '#6558E8',
